@@ -143,8 +143,8 @@ public class JohnOthello implements IOthelloAI {
 						tokens1 += 10;
 					}
 					else if (board[i][j] == 2)
-					if ((i == 0 && j == 0) || (i == 0 && j == size - 1) || (i == size - 1 && j == 0)
-							|| (i == size - 1 && j == size - 1)) {
+					if (((i == 0 && j == 0) || (i == 0 && j == size - 1) || (i == size - 1 && j == 0)
+							|| (i == size - 1 && j == size - 1)) || (i==0 && (j!=1 || j!=size-2) || i==size-1 && (j!=1 || j!=size-2))) {
 						tokens2 += 150;
 					} else if ((i == 1) || (i == size - 2) || (j == 1) || (j == size - 2)) {
 						tokens2 += 5;
