@@ -48,12 +48,12 @@ public class JohnOthello implements IOthelloAI {
 	public UtilPos MaxValue(GameState s, int counter, int trueAlpha, int trueBeta) {
 		UtilPos beta = new UtilPos(Integer.MIN_VALUE, null);
 
-		if (s.isFinished()) {
+		if (s.isFinished() || counter > searchDepth) {
 			return new UtilPos(calculateUtility(s), null);
 		}
 
 		for (Position p : s.legalMoves()) {
-			
+
 			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
 			g.insertToken(p);
 			UtilPos up = MinValue(g, counter++, trueAlpha, trueBeta);
@@ -76,12 +76,12 @@ public class JohnOthello implements IOthelloAI {
 
 	public UtilPos MinValue(GameState s, int counter, int trueAlpha, int trueBeta) {
 		UtilPos alpha = new UtilPos(Integer.MAX_VALUE, null);
-		if (s.isFinished()) {
+		if (s.isFinished() || counter > searchDepth) {
 			return new UtilPos(calculateUtility(s), null);
 		}
 
 		for (Position p : s.legalMoves()) {
-			
+
 			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
 			g.insertToken(p);
 			UtilPos up = MaxValue(g, counter++, trueAlpha, trueBeta);
@@ -120,7 +120,41 @@ public class JohnOthello implements IOthelloAI {
 	public int calculateUtility(GameState s) {
 		// Positive values are good for black, negative values are good for white
 		System.out.println("uwu");
-		int totalValue = s.countTokens()[0] - s.countTokens()[1];
+		var board = s.getBoard();
+		int tokens1 = 0;
+		int tokens2 = 0;
+		var size = board.length;
+
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+
+				if (board[i][j] == 1)
+
+					if (((i == 0 && j == 0) || (i == 0 && j == size - 1) || (i == size - 1 && j == 0)
+							|| (i == size - 1 && j == size - 1)) || (i==0 && (j!=1 || j!=size-2) || i==size-1 && (j!=1 || j!=size-2))) {
+							//corners
+						tokens1 += 150;
+					} else if ((i == 1) || (i == size - 2) || (j == 1) || (j == size - 2)) {
+						//Danger zone
+						tokens1 += 5;
+							
+					} else {
+							//Center
+						tokens1 += 10;
+					}
+					else if (board[i][j] == 2)
+					if ((i == 0 && j == 0) || (i == 0 && j == size - 1) || (i == size - 1 && j == 0)
+							|| (i == size - 1 && j == size - 1)) {
+						tokens2 += 150;
+					} else if ((i == 1) || (i == size - 2) || (j == 1) || (j == size - 2)) {
+						tokens2 += 5;
+					} else {
+						tokens2 += 10;
+					}
+
+			}
+		}
+		int totalValue = tokens1 - tokens2;
 		System.out.println(totalValue);
 		return totalValue;
 	}
