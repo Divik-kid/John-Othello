@@ -30,7 +30,6 @@ public class GameState {
         board[half][half+1] = 2;
         board[half+1][half] = 2;   
 	}
-	
 	/**
 	 * Constructs a new game state that equals the one represented by the supplied board and player.
 	 * @param board The 2 dimensions of the array should have equal length, and possible values should be
