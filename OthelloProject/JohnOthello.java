@@ -22,14 +22,15 @@ public class JohnOthello implements IOthelloAI {
 	}
 
 	public Position MinimaxSearch(GameState s) {
-		var currentPlayer = s.getPlayerInTurn();
-		if(currentPlayer == 1){
+		//var currentPlayer = s.getPlayerInTurn();
+		//if(currentPlayer == 1){
 		var x = MaxValue(s);
+		System.out.println("hewwo :3333");
 		return x.getPos();
-		} else {
-		var y = MinValue(s);
-		return y.getPos();
-		}
+		//} else {
+		//var y = MinValue(s);
+		//return y.getPos();
+		//}
 		
 	}
 
@@ -45,6 +46,7 @@ public class JohnOthello implements IOthelloAI {
 			UtilPos up = MinValue(g);
 			if (up.getUtil() > beta.getUtil()) {
 				beta = up;
+				beta.setPos(p);
 			}
 		}
 
@@ -62,6 +64,7 @@ public class JohnOthello implements IOthelloAI {
 			UtilPos up = MaxValue(g);
 			if (up.getUtil() < alpha.getUtil()) {
 				alpha = up;
+				alpha.setPos(p);
 			}
 		}
 
