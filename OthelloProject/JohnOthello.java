@@ -4,9 +4,11 @@ public class JohnOthello implements IOthelloAI {
 
 	// GameTree topOfGameTree;
 	// boolean firstMove = false;
+	public int searchDepth = 1000;
 
 	public Position decideMove(GameState s) {
 		GameState state = s;
+		searchDepth = 3;
 		/*
 		 * if (this.firstMove = false){
 		 * this.topOfGameTree = new GameTree(s, null);
@@ -26,14 +28,14 @@ public class JohnOthello implements IOthelloAI {
 	public Position MinimaxSearch(GameState s) {
 		var currentPlayer = s.getPlayerInTurn();
 		if (currentPlayer == 1) {
-			var x = MaxValue(s, 0);
+			var x = MaxValue(s, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
 			System.out.println("hewwo :3333");
 			System.out.println("I was!");
-			System.out.println( s.getPlayerInTurn());
+			System.out.println(s.getPlayerInTurn());
 			System.out.println(x.getPos());
 			return x.getPos();
 		} else if (currentPlayer == 2) {
-			var y = MaxValue(s, 0);
+			var y = MaxValue(s, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
 			System.out.println("hewwo :3333");
 			System.out.println("I was!");
 			System.out.println(s.getPlayerInTurn());
@@ -43,46 +45,67 @@ public class JohnOthello implements IOthelloAI {
 		return new Position(-1, -1);
 	}
 
-	public UtilPos MaxValue(GameState s, int counter) {
+	public UtilPos MaxValue(GameState s, int counter, int trueAlpha, int trueBeta) {
 		UtilPos beta = new UtilPos(Integer.MIN_VALUE, null);
-		if(counter < 6){
-		if (s.isFinished()) {
-			return new UtilPos(calculateUtility(s), null);
-		}
-
-		for (Position p : s.legalMoves()) {
-			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
-			g.insertToken(p);
-			UtilPos up = MinValue(g, counter++);
-			if (up.getUtil() >= beta.getUtil()) {
-				beta = up;
-				beta.setPos(p);
+		
+			if (s.isFinished()) {
+				return new UtilPos(calculateUtility(s), null);
 			}
-		}
-	}
+
+			for (Position p : s.legalMoves()) {
+				System.out.println("OWO");
+				GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
+				g.insertToken(p);
+				UtilPos up = MinValue(g, counter++, trueAlpha, trueBeta);
+				if (up.getUtil() >= beta.getUtil()) {
+					beta = up;
+					beta.setPos(p);
+					
+					if (trueAlpha <= beta.getUtil()) {
+						System.out.println("UWU");
+						trueAlpha = beta.getUtil();
+					}
+				
+				}
+				if (counter > searchDepth){
+				if (beta.getUtil() >= trueBeta)
+					return beta;
+				}
+			}
 
 		return beta;
 	}
 
-	public UtilPos MinValue(GameState s, int counter) {
+	public UtilPos MinValue(GameState s, int counter, int trueAlpha, int trueBeta) {
 		UtilPos alpha = new UtilPos(Integer.MAX_VALUE, null);
 		if (s.isFinished()) {
 			return new UtilPos(calculateUtility(s), null);
 		}
-		if(counter < 6){
-		for (Position p : s.legalMoves()) {
-			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
-			g.insertToken(p);
-			UtilPos up = MaxValue(g,counter++);
-			if (up.getUtil() <= alpha.getUtil()) {
-				alpha = up;
-				alpha.setPos(p);
-			}
-		}
-	}
 
-		return alpha;
-	}
+			for (Position p : s.legalMoves()) {
+				System.out.println("OWO");
+				GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
+				g.insertToken(p);
+				UtilPos up = MaxValue(g, counter++, trueAlpha, trueBeta);
+				if (up.getUtil() <= alpha.getUtil()) {
+					alpha = up;
+					alpha.setPos(p);
+					
+						if (trueBeta >= alpha.getUtil()) {
+							System.out.println("UWU");
+							trueBeta = alpha.getUtil();
+						}
+					
+				}
+				if (counter > searchDepth) {
+					if (alpha.getUtil() <= trueBeta)
+						return alpha;
+				}
+			}
+			
+			return alpha;
+		}
+		
 
 	public int calculateUtility(GameState s) {
 		// Positive values are good for black, negative values are good for white
