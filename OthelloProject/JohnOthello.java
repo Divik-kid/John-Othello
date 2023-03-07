@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.management.NotificationEmitter;
 
 public class JohnOthello implements IOthelloAI {
 
