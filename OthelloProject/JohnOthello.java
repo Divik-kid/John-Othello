@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.management.NotificationEmitter;
 
 public class JohnOthello implements IOthelloAI {
 
@@ -59,9 +56,9 @@ public class JohnOthello implements IOthelloAI {
 			return new UtilPos(calculateUtility(s), null);
 		}
 		UtilPos alpha = new UtilPos(Integer.MAX_VALUE, null);
-			for(Position p : s.legalMoves()) {
+			for(Position po : s.legalMoves()) {
 			GameState g = s;
-			g.insertToken(p);
+			g.insertToken(po);
 			UtilPos up = MaxValue(g);
 			if (up.getUtil() < alpha.getUtil()) {
 				alpha = up;
