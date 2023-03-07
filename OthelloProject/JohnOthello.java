@@ -28,6 +28,7 @@ public class JohnOthello implements IOthelloAI {
 		//var currentPlayer = s.getPlayerInTurn();
 		//if(currentPlayer == 1){
 		var x = MaxValue(s);
+		System.out.println("hewwo :3333");
 		return x.getPos();
 		//} else {
 		//var y = MinValue(s);
