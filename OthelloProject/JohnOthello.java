@@ -10,6 +10,7 @@ public class JohnOthello implements IOthelloAI {
 		GameState state = s;
 		searchDepth = 3;	
 		
+		//increases the search depth according to total tokens on the board
 		if(s.countTokens()[1]+s.countTokens()[0] >= 20){
 			searchDepth++;
 			System.out.println("U P G R A D E :" + searchDepth);
@@ -137,6 +138,8 @@ public class JohnOthello implements IOthelloAI {
 		int tokens1 = 0;
 		int tokens2 = 0;
 		var size = board.length;
+
+		//on the final part of the game, prioritises total tokens over positioning
 		if(searchDepth<=5){
 		//Board position evaluation
 			for (int i = 0; i < size; i++) {
