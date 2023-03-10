@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-import java.io.BufferedReader;
 //imports used for logging times in log.txt such that an average time can be calculated
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException; 
 import java.io.FileWriter;
 import java.util.Scanner;
