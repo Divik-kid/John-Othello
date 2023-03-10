@@ -1,4 +1,11 @@
 import java.util.ArrayList;
+import java.io.BufferedReader;
+//imports used for logging times in log.txt such that an average time can be calculated
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException; 
+import java.io.FileWriter;
+import java.util.Scanner;
 
 public class JohnOthello implements IOthelloAI {
 
@@ -11,26 +18,19 @@ public class JohnOthello implements IOthelloAI {
 		searchDepth = 3;	
 		
 		//increases the search depth according to total tokens on the board
-		if(s.countTokens()[1]+s.countTokens()[0] >= 20){
+		if(totalTokens(s) >= 20){
 			searchDepth++;
-			System.out.println("U P G R A D E :" + searchDepth);
-			if(s.countTokens()[1]+s.countTokens()[0] >= 30){
+			if(totalTokens(s)>= 30){
 				searchDepth++;
-				System.out.println("I N S T A L L :" + searchDepth);
-				if(s.countTokens()[1]+s.countTokens()[0] >= 40){
+				if(totalTokens(s) >= 40){
+					if (totalTokens(s) >= 50){
+						searchDepth+=2;
+					}
 					searchDepth+=3;
-					System.out.println("E N H A N C E :" + searchDepth);
 				}
 			}
 		}
-		/*
-		 * if (this.firstMove = false){
-		 * this.topOfGameTree = new GameTree(s, null);
-		 * topOfGameTree.GenerateGameTree();
-		 * this.firstMove = true;
-		 * }
-		 */
-		
+		System.out.println("I N S T A L L :" + searchDepth);
 		ArrayList<Position> moves = state.legalMoves();
 		if (!moves.isEmpty()){
 			return MinimaxSearch(s);
@@ -39,26 +39,64 @@ public class JohnOthello implements IOthelloAI {
 		
 	}
 
+	public void createTimeLog(Double time){
+		try {
+			String filePath = "TimeLog.txt"; // Replace with the path to your file
+      		  File file = new File(filePath);
+       		 if (file.exists()) {
+            	writeTimelog(file, new FileWriter(file.getAbsolutePath(),true), time);
+        	} else {
+				File tLog = new File("TimeLog.txt");
+				FileWriter logWriter = new FileWriter(tLog,true);
+				writeTimelog(new File(filePath), logWriter, time);
+       		}
+			
+		  } catch (IOException e) {
+			System.out.println("An error occurred when creating log file");
+			e.printStackTrace();
+		  }
+	}
+
+	public void writeTimelog(File tLog, FileWriter logWriter, Double time){
+		try{
+			Scanner file = new Scanner(new File("TimeLog.txt"));
+			logWriter.write(time.toString() + System.lineSeparator());
+			
+			logWriter.close();
+			file.close();	
+		} catch (IOException e) {
+			System.out.println("An error occurred when writing log file");
+			e.printStackTrace();
+		  }
+				
+	}
+
+	public int totalTokens(GameState s){
+		return s.countTokens()[1]+s.countTokens()[0];
+	}
+
 	public Position MinimaxSearch(GameState s) {
 		var startTime = System.nanoTime();
 		var currentPlayer = s.getPlayerInTurn();
+		double time;
 		if (currentPlayer == 1) {
+			//If Black Then Play as Max
 			var x = MaxValue(s, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-			System.out.println("hewwo :3333");
-			System.out.println("I was!");
-			System.out.println(s.getPlayerInTurn());
-			System.out.println(x.getPos());
-			System.out.println((System.nanoTime()-startTime)/1_000_000_000.0);
+			System.out.println(x.getPos() + " EVAL: " + x.getUtil());
+			System.out.println("TIME: " + (System.nanoTime()-startTime)/1_000_000_000.0);
+			time =((System.nanoTime()-startTime)/1_000_000_000.0);
+			createTimeLog(time);
 			return x.getPos();
 		} else if (currentPlayer == 2) {
+			//If White Then Play as Min
 			var y = MinValue(s, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-			System.out.println("hewwo :3333");
-			System.out.println("I was!");
-			System.out.println(s.getPlayerInTurn());
-			System.out.println(y.getPos());
-			System.out.println((System.nanoTime()-startTime)/1_000_000_000.0);
+			System.out.println(y.getPos() + " EVAL: " + y.getUtil());
+			System.out.println("TIME: " + (System.nanoTime()-startTime)/1_000_000_000.0);
+			time =((System.nanoTime()-startTime)/1_000_000_000.0);
+			createTimeLog(time);
 			return y.getPos();
 		}
+		//No Possible moves left
 		return new Position(-1, -1);
 	}
 
@@ -70,7 +108,6 @@ public class JohnOthello implements IOthelloAI {
 		}
 
 		for (Position p : s.legalMoves()) {
-
 			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
 			g.insertToken(p);
 			UtilPos up = MinValue(g, counter++, trueAlpha, trueBeta);
@@ -79,8 +116,8 @@ public class JohnOthello implements IOthelloAI {
 				beta.setPos(p);
 
 				trueAlpha = Max(beta.getUtil(), trueAlpha);
-
 			}
+			//Pruning
 			if (counter >= searchDepth) {
 				if (beta.getUtil() > trueBeta)
 					return beta;
@@ -108,6 +145,7 @@ public class JohnOthello implements IOthelloAI {
 				trueBeta = Min(trueBeta, alpha.getUtil());
 
 			}
+			//Pruning
 			if (counter >= searchDepth) {
 				if (alpha.getUtil() < trueBeta)
 					return alpha;
@@ -117,6 +155,8 @@ public class JohnOthello implements IOthelloAI {
 		return alpha;
 	}
 
+	
+	//Returns the lesser of two integers
 	private int Min(int trueBeta, Integer util) {
 		if (util < trueBeta) {
 			return util;
@@ -125,6 +165,7 @@ public class JohnOthello implements IOthelloAI {
 
 	}
 
+	//Returns the greater of two integers
 	private int Max(Integer util, int trueAlpha) {
 		if (util > trueAlpha) {
 			return util;
@@ -132,6 +173,7 @@ public class JohnOthello implements IOthelloAI {
 			return trueAlpha;
 	}
 
+	//Calculates the utility of the gamestate
 	public int calculateUtility(GameState s) {
 		// Positive values are good for black, negative values are good for white
 		var board = s.getBoard();
