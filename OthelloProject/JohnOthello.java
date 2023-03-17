@@ -97,9 +97,9 @@ public class JohnOthello implements IOthelloAI {
 		//No Possible moves left
 		return new Position(-1, -1);
 	}
-
-	public UtilPos MaxValue(GameState s, int counter, int trueAlpha, int trueBeta) {
-		UtilPos beta = new UtilPos(Integer.MIN_VALUE, null);
+	
+	public UtilPos MaxValue(GameState s, int counter, int alpha, int beta) {
+		UtilPos actionValue = new UtilPos(Integer.MIN_VALUE, null);
 
 		if (s.isFinished() || counter > searchDepth) {
 			return new UtilPos(calculateUtility(s), null);
@@ -108,25 +108,25 @@ public class JohnOthello implements IOthelloAI {
 		for (Position p : s.legalMoves()) {
 			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
 			g.insertToken(p);
-			UtilPos up = MinValue(g, counter++, trueAlpha, trueBeta);
-			if (up.getUtil() >= beta.getUtil()) {
-				beta = up;
-				beta.setPos(p);
+			UtilPos up = MinValue(g, counter++, alpha, beta);
+			if (up.getUtil() >= actionValue.getUtil()) {
+				actionValue = up;
+				actionValue.setPos(p);
 
-				trueAlpha = Max(beta.getUtil(), trueAlpha);
+				alpha = Max(actionValue.getUtil(), alpha);
 			}
 			//Pruning
 			if (counter >= searchDepth) {
-				if (beta.getUtil() > trueBeta)
-					return beta;
+				if (actionValue.getUtil() > beta)
+					return actionValue;
 			}
 		}
 
-		return beta;
+		return actionValue;
 	}
 
-	public UtilPos MinValue(GameState s, int counter, int trueAlpha, int trueBeta) {
-		UtilPos alpha = new UtilPos(Integer.MAX_VALUE, null);
+	public UtilPos MinValue(GameState s, int counter, int alpha, int beta) {
+		UtilPos actionValue = new UtilPos(Integer.MAX_VALUE, null);
 		if (s.isFinished() || counter > searchDepth) {
 			return new UtilPos(calculateUtility(s), null);
 		}
@@ -135,22 +135,22 @@ public class JohnOthello implements IOthelloAI {
 
 			GameState g = new GameState(s.getBoard(), s.getPlayerInTurn());
 			g.insertToken(p);
-			UtilPos up = MaxValue(g, counter++, trueAlpha, trueBeta);
-			if (up.getUtil() <= alpha.getUtil()) {
-				alpha = up;
-				alpha.setPos(p);
+			UtilPos up = MaxValue(g, counter++, alpha, beta);
+			if (up.getUtil() <= actionValue.getUtil()) {
+				actionValue = up;
+				actionValue.setPos(p);
 
-				trueBeta = Min(trueBeta, alpha.getUtil());
+				beta = Min(beta, actionValue.getUtil());
 
 			}
 			//Pruning
 			if (counter >= searchDepth) {
-				if (alpha.getUtil() < trueBeta)
-					return alpha;
+				if (actionValue.getUtil() < beta)
+					return actionValue;
 			}
 		}
 
-		return alpha;
+		return actionValue;
 	}
 
 	
@@ -175,8 +175,8 @@ public class JohnOthello implements IOthelloAI {
 	public int calculateUtility(GameState s) {
 		// Positive values are good for black, negative values are good for white
 		var board = s.getBoard();
-		int tokens1 = 0;
-		int tokens2 = 0;
+		int tokens1 = 0; //black tokens
+		int tokens2 = 0; //white tokens
 		var size = board.length;
 
 		//on the final part of the game, prioritises total tokens over positioning
@@ -218,3 +218,30 @@ public class JohnOthello implements IOthelloAI {
 	}
 
 }
+//the tuple of position and utility of said position in the Minimax search
+class UtilPos {
+    private Position position;
+    private Integer utility;
+
+    public UtilPos(Integer u, Position p){
+    this.position = p;
+    this.utility = u;
+    }
+
+    public Integer getUtil(){
+        return this.utility;
+    }
+
+    public Position getPos(){
+        return this.position;
+    }
+
+    public void setUtil(int i){
+        this.utility = i;
+    }
+
+    public void setPos(Position p){
+        this.position = p;
+    }
+}
+
